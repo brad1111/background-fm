@@ -34,7 +34,8 @@ IMAGE_URLS=$(curl $URL | grep '<image size="extralarge"' | sed -r 's/<\/?\w(\w||
 declare -a FILE_NAMES
 for IMAGE_URL in $IMAGE_URLS; do
 	FILENAME=$(grep -Po '\w+\.\w+$' <<< $IMAGE_URL)
-	if [ ! -e $FILENAME ]; then
-		curl $IMAGE_URL -o $CACHE_DIR/$FILENAME
+	FILE_LOCATION=$CACHE_DIR/$FILENAME
+	if [ ! -e $FILE_LOCATION ]; then
+		curl $IMAGE_URL -o $FILE_LOCATION 
 	fi
 done
