@@ -30,4 +30,11 @@ ALBUM_COUNT=20
 USERNAME=thebradad1111
 URL="http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=${USERNAME}&api_key=${APIKEY}&period=1month&limit=20"
 echo URL:$URL
-curl $URL | grep '<image size="extralarge"' | sed -r 's/<\/?\w(\w|| )+(="\w+")?>//g' | sed 's/ //g'
+IMAGE_URLS=$(curl $URL | grep '<image size="extralarge"' | sed -r 's/<\/?\w(\w|| )+(="\w+")?>//g' | sed 's/ //g')
+declare -a FILE_NAMES
+for IMAGE_URL in $IMAGE_URLS; do
+	FILENAME=$(grep -Po '\w+\.\w+$' <<< $IMAGE_URL)
+	if [ ! -e $FILENAME ]; then
+		curl $IMAGE_URL -o $CACHE_DIR/$FILENAME
+	fi
+done
