@@ -28,7 +28,7 @@ APIKEY=$(cat $APIKEYLOCATION)
 
 ALBUM_COUNT=20
 USERNAME=thebradad1111
-URL="http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=${USERNAME}&api_key=${APIKEY}&period=1month&limit=20"
+URL="http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=${USERNAME}&api_key=${APIKEY}&period=1month&limit=${ALBUM_COUNT}"
 echo URL:$URL
 IMAGE_URLS=$(curl $URL | grep '<image size="extralarge"' | sed -r 's/<\/?\w(\w|| )+(="\w+")?>//g' | sed 's/ //g')
 declare -a FILE_NAMES
@@ -39,3 +39,9 @@ for IMAGE_URL in $IMAGE_URLS; do
 		curl $IMAGE_URL -o $FILE_LOCATION 
 	fi
 done
+
+OUTIMG=$CACHE_DIR/out.png
+if [ -e $OUTIMG ]; then
+	rm $OUTIMG
+fi
+montage -geometry +0+0 $CACHE_DIR/* $OUTIMG
