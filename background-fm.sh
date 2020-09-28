@@ -28,11 +28,10 @@ if [ ! -e $APIKEYLOCATION ]; then
 fi
 APIKEY=$(cat $APIKEYLOCATION)
 
-#Get number of albums to get
-##First get screen resolution
-
-
-ALBUM_COUNT=20
+#Get number of albums etc
+X=6
+Y=4
+let ALBUM_COUNT=$X*$Y
 USERNAME=thebradad1111
 URL="http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=${USERNAME}&api_key=${APIKEY}&period=1month&limit=${ALBUM_COUNT}"
 #Get image urls from XML
@@ -52,4 +51,4 @@ OUTIMG=$CACHE_DIR/out.png
 if [ -e $OUTIMG ]; then
 	rm $OUTIMG
 fi
-montage -geometry +0+0 ${FILE_LOCATIONS[*]} $OUTIMG
+montage -tile ${X}x${Y} -geometry +0+0 ${FILE_LOCATIONS[*]} $OUTIMG
