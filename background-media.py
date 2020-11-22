@@ -4,15 +4,21 @@ gi.require_version('Playerctl', '2.0')
 from gi.repository import GLib, Playerctl
 import subprocess
 import re
+from urllib import request, parse
+import os.path
+import json
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+from xdg import xdg_cache_home, xdg_config_home
 
 player = Playerctl.Player()
-
 playing = False
 
-cachedir = GLib.get_user_special_dir(GLib.USER
+cachedir = xdg_cache_home().joinpath("background-media")
+configdir = xdg_config_home().joinpath("background-media")
 
 def on_metadata(player, metadata):
-    print(playing)
+   #print(playing)
     print(metadata)
    
     artUrl = None
@@ -20,11 +26,27 @@ def on_metadata(player, metadata):
     if 'mpris:artUrl' and 'mpris:trackid' in metadata.keys():
         artUrl = metadata["mpris:artUrl"]
         trackId = metadata["mpris:trackid"]
+        try:
+            artUrl =sp.track(trackId)["album"]["images"][0]["url"]
+        except:
+            print("couldn't find artUrl from api, using mpris")
+        #print(sp.track(trackId)["images"])
+    else:
+        return
     
+    #print(imageLocation)
+
+# convert ab67616d0000b27322fcfdc99b8aa0dbe167989d \( -clone 0 -blur 0x9 -resize 1920x1200\! \) \( -clone 0 \) -delete 0 -gravity center -compose over -composite result.png # to blur image
+
     if isinstance(trackId, str) and isinstance(artUrl, str) and trackId.startswith('spotify'):
-        artUrl = re.sub("https?:\\/\\/open.spotify.com\\/image\\/", "https://i.scdn.co/image", artUrl) 
-    print(artUrl)
-    subprocess.run(["feh","--bg-max","/home/bradley/.cache/background-fm/0ae77c1bb44c6b3aba4fb0d83551493c.jpg"])
+        artUrl = re.sub("https?:\\/\\/open.spotify.com\\/image\\/", "https://i.scdn.co/image/", artUrl) 
+    fileName = parse.urlparse(artUrl).path.split('/')[-1]
+    imageLocation = cachedir.joinpath(fileName)
+    if not os.path.isfile(imageLocation):
+       print("Downloading:" + artUrl)
+       request.urlretrieve(artUrl, imageLocation)
+    # print(artUrl)
+    subprocess.run(["feh","--bg-max",imageLocation])
     #if 'mpris:artUrl' in metadata.keys():
      #   print(metadata['mpris:artUrl'])
 
@@ -40,5 +62,11 @@ player.connect('metadata', on_metadata)
 player.connect('playback-status::playing', on_play)
 player.connect('playback-status::paused', on_pause)
 
+# spotify auth
+spotifyConfig = json.loads(open(configdir.joinpath("spotify_config.json"), 'r').read())
+print(spotifyConfig)
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=spotifyConfig["id"],client_secret=spotifyConfig["secret"]))
+
+    
 main = GLib.MainLoop()
 main.run()
