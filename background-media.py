@@ -36,17 +36,20 @@ def on_metadata(player, metadata):
     
     #print(imageLocation)
 
-# convert ab67616d0000b27322fcfdc99b8aa0dbe167989d \( -clone 0 -blur 0x9 -resize 1920x1200\! \) \( -clone 0 \) -delete 0 -gravity center -compose over -composite result.png # to blur image
 
     if isinstance(trackId, str) and isinstance(artUrl, str) and trackId.startswith('spotify'):
         artUrl = re.sub("https?:\\/\\/open.spotify.com\\/image\\/", "https://i.scdn.co/image/", artUrl) 
     fileName = parse.urlparse(artUrl).path.split('/')[-1]
     imageLocation = cachedir.joinpath(fileName)
+    resultImage = cachedir.joinpath("result.png")
+    print(resultImage)
     if not os.path.isfile(imageLocation):
        print("Downloading:" + artUrl)
        request.urlretrieve(artUrl, imageLocation)
     # print(artUrl)
-    subprocess.run(["feh","--bg-max",imageLocation])
+# convert ab67616d0000b27322fcfdc99b8aa0dbe167989d \( -clone 0 -blur 0x9 -resize 1920x1200\! \) \( -clone 0 \) -delete 0 -gravity center -compose over -composite result.png # to blur image
+    subprocess.run(["convert", imageLocation, "(", "-clone", "0", "-blur", "0x9", "-resize", "1920x1200!", ")", "(", "-clone", "0", ")", "-delete", "0", "-gravity", "center", "-compose", "over", "-composite", resultImage])
+    subprocess.run(["feh","--bg-max",resultImage])
     #if 'mpris:artUrl' in metadata.keys():
      #   print(metadata['mpris:artUrl'])
 
