@@ -8,6 +8,7 @@ from urllib import request, parse
 import os.path
 import json
 import spotipy
+from Xlib.display import Display
 from spotipy.oauth2 import SpotifyClientCredentials
 from xdg import xdg_cache_home, xdg_config_home
 
@@ -18,6 +19,11 @@ previousAlbumArt = None #Used to not reblur if you're listening to an album
 cachedir = xdg_cache_home().joinpath("background-media")
 configdir = xdg_config_home().joinpath("background-media")
 
+def getResolution():
+    screen = Display(':0').screen()
+    return "{}x{}".format(screen.width_in_pixels,screen.height_in_pixels)
+resolution = getResolution()
+print(resolution)
 def on_metadata(player, metadata):
    #print(playing)
    #print(metadata)
@@ -25,6 +31,7 @@ def on_metadata(player, metadata):
     if not playing:
         return
     global previousAlbumArt 
+    global resolution
     
     artUrl = None
     trackId = None
@@ -55,7 +62,7 @@ def on_metadata(player, metadata):
 # convert ab67616d0000b27322fcfdc99b8aa0dbe167989d \( -clone 0 -blur 0x9 -resize 1920x1200\! \) \( -clone 0 \) -delete 0 -gravity center -compose over -composite result.png # to blur image
     if imageLocation != previousAlbumArt:
         print("blurring image")
-        subprocess.run(["convert", imageLocation, "(", "-clone", "0", "-blur", "0x9", "-resize", "1920x1200!", ")", "(", "-clone", "0", ")", "-delete", "0", "-gravity", "center", "-compose", "over", "-composite", resultImage])
+        subprocess.run(["convert", imageLocation, "(", "-clone", "0", "-blur", "0x9", "-resize", resolution + "!" , ")", "(", "-clone", "0", ")", "-delete", "0", "-gravity", "center", "-compose", "over", "-composite", resultImage])
     subprocess.run(["feh","--bg-max",resultImage])
     previousAlbumArt = imageLocation
     #if 'mpris:artUrl' in metadata.keys():
