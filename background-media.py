@@ -22,6 +22,8 @@ def on_metadata(player, metadata):
    #print(playing)
    #print(metadata)
     
+    if not playing:
+        return
     global previousAlbumArt 
     
     artUrl = None
@@ -66,6 +68,7 @@ def on_play(player,status):
 def on_pause(player,status):
     global playing
     playing = False
+    subprocess.run(["feh","--bg-tile",cachedir.joinpath("../background-fm/out.png")])
 
 player.connect('metadata', on_metadata)
 player.connect('playback-status::playing', on_play)
