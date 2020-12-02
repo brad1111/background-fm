@@ -22,8 +22,18 @@ configdir = xdg_config_home().joinpath("background-media")
 def getResolution():
     screen = Display(':0').screen()
     return "{}x{}".format(screen.width_in_pixels,screen.height_in_pixels)
+def squareResolution():
+    screen = Display(':0').screen()
+    x = screen.width_in_pixels
+    y = screen.width_in_pixels
+    if x >= y:
+        return "{}x{}".format(x,x)
+    else:
+        return "{}x{}".format(y,y)
+
 resolution = getResolution()
 print(resolution)
+print(squareResolution())
 def on_metadata(player, metadata):
    #print(playing)
    #print(metadata)
@@ -45,12 +55,11 @@ def on_metadata(player, metadata):
         #print(sp.track(trackId)["images"])
     else:
         return
-    
     #print(imageLocation)
 
-
     if isinstance(trackId, str) and isinstance(artUrl, str) and trackId.startswith('spotify'):
-        artUrl = re.sub("https?:\\/\\/open.spotify.com\\/image\\/", "https://i.scdn.co/image/", artUrl) 
+        artUrl = re.sub("https?:\\/\\/open.spotify.com\\/image\\/",
+                        "https://i.scdn.co/image/", artUrl)
     fileName = parse.urlparse(artUrl).path.split('/')[-1]
     imageLocation = cachedir.joinpath(fileName)
     resultImage = cachedir.joinpath("result.png")
@@ -62,8 +71,8 @@ def on_metadata(player, metadata):
 # convert ab67616d0000b27322fcfdc99b8aa0dbe167989d \( -clone 0 -blur 0x9 -resize 1920x1200\! \) \( -clone 0 \) -delete 0 -gravity center -compose over -composite result.png # to blur image
     if imageLocation != previousAlbumArt:
         print("blurring image")
-        subprocess.run(["convert", imageLocation, "(", "-clone", "0", "-blur", "0x9", "-resize", resolution + "!" , ")", "(", "-clone", "0", ")", "-delete", "0", "-gravity", "center", "-compose", "over", "-composite", resultImage])
-    subprocess.run(["feh","--bg-max",resultImage])
+        subprocess.run(["convert", imageLocation, "(", "-clone", "0", "-blur", "0x9", "-resize", squareResolution() + "!" , ")", "(", "-clone", "0", ")", "-delete", "0", "-gravity", "center", "-compose", "over", "-composite", resultImage])
+    subprocess.run(["feh","--bg-fill",resultImage])
     previousAlbumArt = imageLocation
     #if 'mpris:artUrl' in metadata.keys():
      #   print(metadata['mpris:artUrl'])
