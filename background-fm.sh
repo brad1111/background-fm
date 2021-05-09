@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #Setup directories and stuff
 NAME=background-fm
@@ -7,13 +7,13 @@ if [ -z $HOME ] && ([ -z $XDG_DATA_HOME ] || [ -z $XDG_CACHE_HOME ]); then
 	exit 1
 fi
 if [ -z $XDG_DATA_HOME ]; then
-	XDG_DATA_HOME=$HOME/.local/share
+	XDG_DATA_HOME="$HOME/.local/share"
 fi
 if [ -z $XDG_CACHE_HOME ]; then
-	XDG_CACHE_HOME=$HOME/.cache
+	XDG_CACHE_HOME="$HOME/.cache"
 fi
-DATA_DIR=$XDG_DATA_HOME/$NAME
-CACHE_DIR=$XDG_CACHE_HOME/$NAME
+DATA_DIR="$XDG_DATA_HOME/$NAME"
+CACHE_DIR="$XDG_CACHE_HOME/$NAME"
 if [ ! -d $DATA_DIR ]; then
 	mkdir -p $DATA_DIR
 fi

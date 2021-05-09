@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Background media daemon
 import gi
 gi.require_version('Playerctl', '2.0')
 from gi.repository import GLib, Playerctl
@@ -25,7 +26,7 @@ def getResolution():
 def squareResolution():
     screen = Display(':0').screen()
     x = screen.width_in_pixels
-    y = screen.width_in_pixels
+    y = screen.height_in_pixels
     if x >= y:
         return "{}x{}".format(x,x)
     else:
@@ -72,7 +73,7 @@ def on_metadata(player, metadata):
     if imageLocation != previousAlbumArt:
         print("blurring image")
         subprocess.run(["convert", imageLocation, "(", "-clone", "0", "-blur", "0x9", "-resize", squareResolution() + "!" , ")", "(", "-clone", "0", ")", "-delete", "0", "-gravity", "center", "-compose", "over", "-composite", resultImage])
-    subprocess.run(["feh","--bg-fill",resultImage])
+#    subprocess.run(["feh","--bg-fill",resultImage])
     previousAlbumArt = imageLocation
     #if 'mpris:artUrl' in metadata.keys():
      #   print(metadata['mpris:artUrl'])
@@ -80,11 +81,13 @@ def on_metadata(player, metadata):
 def on_play(player,status):
     global playing
     playing = True
+    open(cachedir.joinpath(".playing"),'w')
 
 def on_pause(player,status):
     global playing
     playing = False
-    subprocess.run(["feh","--bg-tile",cachedir.joinpath("../background-fm/out.png")])
+#    subprocess.run(["feh","--bg-tile",cachedir.joinpath("../background-fm/out.png")])
+    os.remove(cachedir.joinpath(".playing"))
 
 player.connect('metadata', on_metadata)
 player.connect('playback-status::playing', on_play)
