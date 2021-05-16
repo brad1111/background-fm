@@ -6,11 +6,8 @@ fi
 if [ -z $XDG_DATA_HOME ]; then
 	XDG_DATA_HOME="$HOME/.local/share"
 fi
-if [ -z $XDG_CACHE_HOME ]; then
-	XDG_CACHE_HOME="$HOME/.cache"
-fi
 
-if [ -f "$XDG_CACHE_HOME/background-media/.playing" ]; then
+if [ -f "/tmp/background-media/playing" ]; then
     IMAGE="$XDG_CACHE_HOME/background-media/result.png"
     FEH_OPTIONS="--bg-fill"
 else
