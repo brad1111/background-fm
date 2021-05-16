@@ -12,6 +12,8 @@ import spotipy
 from Xlib.display import Display
 from spotipy.oauth2 import SpotifyClientCredentials
 from xdg import xdg_cache_home, xdg_config_home
+from pathlib import Path
+import tempfile
 
 player = Playerctl.Player()
 playing = False
@@ -19,6 +21,12 @@ previousAlbumArt = None #Used to not reblur if you're listening to an album
 
 cachedir = xdg_cache_home().joinpath("background-media")
 configdir = xdg_config_home().joinpath("background-media")
+tempdir = Path(os.path.join(tempfile.gettempdir(),"background-media"))
+
+#setup dirs
+cachedir.mkdir(parents=True, exist_ok=True)
+configdir.mkdir(parents=True, exist_ok=True)
+tempdir.mkdir(parents=True, exist_ok=True)
 
 def getResolution():
     screen = Display(':0').screen()
@@ -81,13 +89,14 @@ def on_metadata(player, metadata):
 def on_play(player,status):
     global playing
     playing = True
-    open(cachedir.joinpath(".playing"),'w')
+    print(os.path.join(tempdir,"playing"))
+    open(tempdir.joinpath("playing"),'w')
 
 def on_pause(player,status):
     global playing
     playing = False
 #    subprocess.run(["feh","--bg-tile",cachedir.joinpath("../background-fm/out.png")])
-    os.remove(cachedir.joinpath(".playing"))
+    os.remove(tempdir.joinpath("playing"))
 
 player.connect('metadata', on_metadata)
 player.connect('playback-status::playing', on_play)
