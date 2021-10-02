@@ -80,7 +80,7 @@ def on_metadata(player, metadata):
 # convert ab67616d0000b27322fcfdc99b8aa0dbe167989d \( -clone 0 -blur 0x9 -resize 1920x1200\! \) \( -clone 0 \) -delete 0 -gravity center -compose over -composite result.png # to blur image
     if imageLocation != previousAlbumArt:
         print("blurring image")
-        subprocess.run(["convert", imageLocation, "(", "-clone", "0", "-blur", "0x9", "-resize", squareResolution() + "!" , ")", "(", "-clone", "0", ")", "-delete", "0", "-gravity", "center", "-compose", "over", "-composite", resultImage])
+        subprocess.run(["convert", imageLocation, "(", "-clone", "0","-resample", "50%", "-blur", "0x9", "-resize", squareResolution() + "!" , ")", "(", "-clone", "0", ")", "-delete", "0", "-gravity", "center", "-compose", "over", "-composite", resultImage])
 #    subprocess.run(["feh","--bg-fill",resultImage])
     previousAlbumArt = imageLocation
     #if 'mpris:artUrl' in metadata.keys():
